@@ -2,19 +2,21 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MyToken is ERC20, Pausable, Ownable {
+
+    /*///////////////////////////////////////////////////////////////
+                             __          _     
+                       __ _ / _|_      _| |__  
+                      / _` | |_\ \ /\ / / '_ \ 
+                     | (_| |  _|\ V  V /| | | |
+                      \__,_|_|   \_/\_/ |_| |_|
+                      
+    //////////////////////////////////////////////////////////////*/
+    
+contract MyToken is ERC20, Ownable {
     constructor() ERC20("MyToken", "MTK") {}
 
-    function pause() public onlyOwner {
-        _pause();
-    }
-
-    function unpause() public onlyOwner {
-        _unpause();
-    }
 
     function mint(uint256 amount) public onlyOwner {
         _mint(msg.sender, amount);
@@ -22,9 +24,14 @@ contract MyToken is ERC20, Pausable, Ownable {
 
     function _beforeTokenTransfer(address from, address to, uint256 amount)
         internal
-        whenNotPaused
         override
     {
         super._beforeTokenTransfer(from, to, amount);
     }
+
+    function withdraw() external onlyOwner {
+        (bool success, ) = msg.sender.call{value: address(this).balance}("");
+        require(success, "Withdrawal failed");
+    }
+
 }
